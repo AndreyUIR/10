@@ -183,6 +183,33 @@
             overflow: hidden;
             pointer-events: none;
         }
+
+        /* NEW: Controls Group for buttons */
+        .controls-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .controls-group button {
+            margin-top: 0;
+            flex: 1;
+        }
+        
+        /* Music Button Specific Style */
+        #btn-toggle-music {
+            background: #00e5ff; /* Cyan to differentiate */
+            box-shadow: 0 4px 0 #00b8d4;
+            color: #000; /* Better contrast on cyan */
+        }
+        #btn-toggle-music:hover {
+            background: #18ffff;
+            box-shadow: 0 4px 0 #00e5ff, 0 0 20px #00e5ff;
+        }
+        #btn-toggle-music.paused {
+            background: #555;
+            box-shadow: 0 4px 0 #333;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -211,7 +238,12 @@
             <li>Собрать космическое желе</li>
             <li>Победить Террариана</li>
         </ul>
-        <button id="btn-next-task">Далее</button>
+        
+        <!-- Modified Controls -->
+        <div class="controls-group">
+            <button id="btn-toggle-music">Музыка: ВКЛ</button>
+            <button id="btn-next-task">Далее</button>
+        </div>
     </div>
 
     <!-- Task 2 Container (Hidden initially) -->
@@ -235,6 +267,8 @@
     <script>
         // YouTube API Logic
         var player1, player2;
+        var isMusicPlaying = true; // Default state
+        
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -276,6 +310,32 @@
             event.target.playVideo();
             // Set volume to reasonable level
             event.target.setVolume(50);
+            isMusicPlaying = true;
+            updateMusicButton();
+        }
+
+        function toggleMusic() {
+            if (!player1) return;
+            
+            if (isMusicPlaying) {
+                player1.pauseVideo();
+                isMusicPlaying = false;
+            } else {
+                player1.playVideo();
+                isMusicPlaying = true;
+            }
+            updateMusicButton();
+        }
+
+        function updateMusicButton() {
+            var btn = $('#btn-toggle-music');
+            if (isMusicPlaying) {
+                btn.text('Музыка: ВКЛ');
+                btn.removeClass('paused');
+            } else {
+                btn.text('Музыка: ВЫКЛ');
+                btn.addClass('paused');
+            }
         }
 
         // jQuery Logic
@@ -283,6 +343,11 @@
             
             // --- Task 1 Logic ---
             
+            // Music Toggle
+            $('#btn-toggle-music').click(function() {
+                toggleMusic();
+            });
+
             // Add Custom Item
             // jQuery: Click event handler
             $('#btn-add-item').click(function() {
@@ -382,6 +447,8 @@
                     if (player1 && player1.playVideo) {
                         player1.playVideo();
                         player1.setVolume(50);
+                        isMusicPlaying = true; // Reset state tracking
+                        updateMusicButton();
                     }
                 });
             });
