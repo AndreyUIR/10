@@ -32,41 +32,6 @@
             overflow-x: hidden;
         }
 
-        /* Flying Sprites */
-        .dog-sprite {
-            position: fixed;
-            top: 50%;
-            width: 150px;
-            z-index: 10;
-            pointer-events: none;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .dog-sprite.left {
-            left: 20px;
-            transform: translateY(-50%);
-        }
-
-        .dog-sprite.right {
-            right: 20px;
-            transform: translateY(-50%) scaleX(-1); /* Flip horizontally */
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(-50%) scaleX(1); }
-            50% { transform: translateY(-60%) scaleX(1); }
-        }
-        
-        /* Need separate keyframes for right sprite to maintain scaleX(-1) */
-        @keyframes float-right {
-            0%, 100% { transform: translateY(-50%) scaleX(-1); }
-            50% { transform: translateY(-60%) scaleX(-1); }
-        }
-        
-        .dog-sprite.right {
-            animation-name: float-right;
-        }
-
         h1, h2 {
             text-shadow: 0 0 10px var(--secondary-neon);
             color: var(--secondary-neon);
@@ -85,7 +50,7 @@
             max-width: 600px;
             width: 100%;
             position: relative;
-            z-index: 20; /* Above sprites */
+            z-index: 20;
         }
 
         /* Task 1 Styles */
@@ -103,8 +68,6 @@
             transition: all 0.3s ease;
             text-shadow: 2px 2px 0 #000;
         }
-
-        /* Removed li:hover as requested */
 
         .add-item-group {
             display: flex;
@@ -224,9 +187,8 @@
 </head>
 <body>
 
-    <!-- Flying Sprites -->
-    <img src="https://infernummod.wiki.gg/images/DoGP2-1.png?243712" class="dog-sprite left" alt="Devourer of Gods">
-    <img src="https://infernummod.wiki.gg/images/DoGP2-1.png?243712" class="dog-sprite right" alt="Devourer of Gods">
+    <!-- Hidden Root for Vite compatibility -->
+    <div id="root" style="display: none;"></div>
 
     <!-- YouTube Players (Hidden) -->
     <div class="video-container">
@@ -236,7 +198,7 @@
 
     <!-- Task 1 Container -->
     <div id="task1-container" class="container">
-        <h1 id="main-title">Список дел Пожирателя</h1>
+        <h1 id="main-title">Список дел Пожирателя Богов</h1>
         
         <div class="add-item-group">
             <input type="text" id="new-item-text" placeholder="Новое дело...">
@@ -317,25 +279,51 @@
         }
 
         // jQuery Logic
-        $(document).ready(function() {
+        $(document).ready(function() { // jQuery: Run code when DOM is fully loaded
             
             // --- Task 1 Logic ---
             
             // Add Custom Item
+            // jQuery: Click event handler
             $('#btn-add-item').click(function() {
+                // jQuery: Get value from input
                 var text = $('#new-item-text').val().trim();
                 if(text) {
-                    $('#todo-list').append('<li>' + text + '</li>');
-                    $('#new-item-text').val('');
+                    // Check for duplicates
+                    var exists = false;
+                    // jQuery: Iterate over elements
+                    $('#todo-list li').each(function() {
+                        // jQuery: Get text content of element
+                        if ($(this).text() === text) {
+                            exists = true;
+                            return false; // break loop
+                        }
+                    });
+                    
+                    if (!exists) {
+                        // jQuery: Append new HTML element
+                        $('#todo-list').append('<li>' + text + '</li>');
+                        $('#new-item-text').val('');
+                        // jQuery: Remove CSS class
+                        $('#new-item-text').removeClass('error');
+                    } else {
+                        // Shake animation for duplicate
+                        // jQuery: Add CSS class
+                        $('#new-item-text').addClass('error');
+                        setTimeout(function() {
+                            $('#new-item-text').removeClass('error');
+                        }, 500);
+                    }
                 }
             });
 
             $('#btn-next-task').click(function() {
                 // 1. Change Title
+                // jQuery: Set text content
                 $('#main-title').text('GOD DOES NOT FEAR DEATH!');
 
                 // 2. Color list items
-                // Using CSS nth-child for visual accuracy
+                // jQuery: Apply CSS styles
                 $('#todo-list li:nth-child(even)').css({
                     'color': 'gray',
                     'border-color': 'gray',
@@ -348,12 +336,25 @@
                     'text-shadow': '0 0 5px #fff'
                 });
 
-                // 3. Add new item
-                $('#todo-list').append('<li>Изучить jQuery</li>');
+                // 3. Add new item (Check duplicate first just in case, though this is hardcoded)
+                var newItem = 'Изучить jQuery';
+                var exists = false;
+                $('#todo-list li').each(function() {
+                    if ($(this).text() === newItem) {
+                        exists = true;
+                        return false;
+                    }
+                });
+                
+                if (!exists) {
+                    $('#todo-list').append('<li>' + newItem + '</li>');
+                }
 
                 // Transition to Task 2
                 setTimeout(function() {
+                    // jQuery: Fade out animation
                     $('#task1-container').fadeOut(500, function() {
+                        // jQuery: Fade in animation
                         $('#task2-container').fadeIn(500);
                         
                         // Switch Music
@@ -373,6 +374,9 @@
                 $('#task2-container').fadeOut(500, function() {
                     $('#task1-container').fadeIn(500);
                     
+                    // Restore Title
+                    $('#main-title').text('Список дел Пожирателя Богов');
+                    
                     // Switch Music Back
                     if (player2 && player2.stopVideo) player2.stopVideo();
                     if (player1 && player1.playVideo) {
@@ -383,6 +387,7 @@
             });
             
             // Validation on Blur
+            // jQuery: Blur event (focus lost)
             $('#name').blur(function() {
                 if ($(this).val().trim() === '') {
                     $(this).addClass('error');
@@ -392,23 +397,43 @@
             });
 
             // Remove error on focus
+            // jQuery: Focus event
             $('#name').focus(function() {
+                $(this).removeClass('error');
+            });
+            
+            $('#password').focus(function() {
                 $(this).removeClass('error');
             });
 
             // Form Submit
+            // jQuery: Submit event handler
             $('#login-form').submit(function(e) {
-                e.preventDefault(); // Prevent reload
+                e.preventDefault(); // jQuery: Prevent default browser form submission
                 
                 var name = $('#name').val().trim();
+                var password = $('#password').val().trim();
                 
                 if (name === '') {
                     $('#name').addClass('error');
                     return;
                 }
-
-                // Display Greeting
-                $('#greeting').hide().text('Привет, ' + name + '!').fadeIn();
+                
+                // Check Access Code
+                if (password === 'INFERNUM') {
+                    // jQuery: Chaining methods (hide -> text -> fadeIn)
+                    $('#greeting').hide().text('Привет, ' + name + '! Добро пожаловать в Инфернум.').fadeIn();
+                    $('#password').removeClass('error');
+                } else {
+                    // Incorrect password
+                    $('#password').addClass('error');
+                    setTimeout(function() {
+                        $('#password').removeClass('error');
+                    }, 500);
+                    
+                    // Clear greeting if any
+                    $('#greeting').hide();
+                }
             });
         });
     </script>
